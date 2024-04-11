@@ -14,11 +14,11 @@ class App:
         self.xl_filepath = "input/example_excel.xlsx"
 
         self.line_shp = gpd.read_file(self.shp_filepath)
-        self.line_shp = self.correct_format_df(self.line_shp)
+        self.line_shp = self.correctobj.correct_format_df(self.line_shp)
         self.line_lengs = pd.read_excel(self.xl_filepath)
-        self.line_lengs = self.correct_format_df(self.line_lengs)
+        self.line_lengs = self.correctobj.correct_format_df(self.line_lengs)
 
-        self.correct_lengs()
+        self.correctobj.correct_lengs(self.line_shp, self.line_lengs)
 
     def get_filepath(self, desc=str, ftypes=list):
         """
@@ -29,20 +29,32 @@ class App:
     
     def export_new_shp(self):
         pass
-
-    def correct_format_df(self, df):
-        df.columns = [column.lower() for column in df.columns]
-        return df
-    
-    def correct_lengs(self):
-        testdf = pd.merge(self.line_shp, self.line_lengs, how='inner', on="line")
-        testdf["shp_len"] = np.round(testdf["geometry"].apply(shapely.length), 2)
-        testdf = testdf.sort_values(by="line").reset_index(drop=True)
-        print (testdf)
         
 class Correct:
     def __init__(self) -> None:
         pass
+
+    def correct_format_df(self, df) -> gpd.GeoDataFrame:
+        """
+        Operations for formatting the pd.DataFrame and reduce the errors after this step
+        """
+        df.columns = [column.lower() for column in df.columns]
+        return df
+    
+    def check_lens(self, line=LineString) -> gpd.GeoDataFrame:
+        """
+        Function to use with 
+        """
+        pass
+    
+    def correct_lengs(self, line_shp=gpd.GeoDataFrame, line_lengs=pd.DataFrame):
+        
+        testdf = pd.merge(line_shp, line_lengs, how='inner', on="line")
+        testdf["or_shp_len"] = np.round(testdf["geometry"].apply(shapely.length), 2)
+        testdf = testdf.sort_values(by="line").reset_index(drop=True)
+        print (testdf)
+
+        
     
 if __name__ == "__main__":
     correctobj = Correct()
