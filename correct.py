@@ -21,7 +21,7 @@ class App:
         self.line_lengs = pd.read_excel(self.xl_filepath)
         self.line_lengs = self.correctobj.correct_format_df(self.line_lengs)
 
-        self.correctobj.correct_lengs(self.line_shp, self.line_lengs)
+        self.correctobj.correct_lines(self.line_shp, self.line_lengs)
 
     def get_filepath(self, desc=str, ftypes=list):
         """
@@ -40,6 +40,13 @@ class Correct:
     def __init__(self) -> None:
         pass
 
+    def get_az(self, line):
+        """
+        Probably will not be used in this code, but its goal is to calculate the
+        azimuth of a line.
+        """
+        pass
+
     def correct_format_df(self, df) -> gpd.GeoDataFrame:
         """
         Operations for formatting the pd.DataFrame and reduce the errors after this step
@@ -47,35 +54,39 @@ class Correct:
         df.columns = [column.lower() for column in df.columns]
         return df
 
-    def expand_line(self, expand_df, line_shp):
-        """
-        Operation for expanding the line, if it is smaller then the GPR section
-        """
+    def expand_reduce(self, line, length, or_shp_len):
+        vertex_coords = [shapely.get_point(line, n) for n in range(shapely.get_num_points(line))] # store the vertices coordinates
+        vertex_positions = [np.round(line.line_locate_point(vertex_point), 2) for vertex_point in vertex_coords]
+        vertex_array = np.array(list(zip(vertex_coords, vertex_positions)))
+
+        if length > or_shp_len: # expand the shp line
+
+            return line
+
+        elif length < or_shp_len: # reduce the shp line -> ok
+            
+            new_final_point = line.interpolate(length)
+            new_vertex_array = vertex_array[vertex_array[:,1] < length] # excluding vertices after the disered final point
+            new_vertex_array = np.vstack([new_vertex_array, np.array((new_final_point, length))])
+
+            return LineString(new_vertex_array[:,0])
+
+        else: # keep the line length
+            return line
+
         pass
 
-    def reduce_line(self, reduce_df, line_shp):
-        """
-        Operation for reducing the line, if it is bigger then the GPR section 
-        """
-        pass
-
-    def check_lens(self, df):
-
-        print (df["line"])
-
-        pass
-
-    def correct_lengs(self, line_shp=gpd.GeoDataFrame, line_lengs=pd.DataFrame):
+    def correct_lines(self, line_shp=gpd.GeoDataFrame, line_lengs=pd.DataFrame):
         
         testdf = pd.merge(line_shp, line_lengs, how='inner', on="line")
         testdf["or_shp_len"] = np.round(testdf["geometry"].apply(shapely.length), 2)
-        testdf = testdf.sort_values(by="line").reset_index(drop=True)
         
-        testdf.apply(self.check_lens)
+        testdf = testdf.sort_values(by="line").reset_index(drop=True)
+        #print (testdf["geometry"])
+        print (np.vectorize(self.expand_reduce)(testdf["geometry"], testdf["length (m)"], testdf["or_shp_len"]))
+        #testdf.apply(self.check_lens)
+
 
 if __name__ == "__main__":
     correctobj = Correct()
     app = App(correctobj)
-
-    #print (app.line_lengs)
-    #print (app.line_shp)
