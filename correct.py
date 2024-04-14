@@ -2,6 +2,7 @@ import geopandas as gpd
 import pandas as pd
 import numpy as np
 import tkinter.filedialog as fd
+import shapely.affinity
 from shapely.geometry import LineString
 import shapely
 
@@ -32,6 +33,16 @@ class App:
     
     def export_new_shp(self):
         pass
+
+    def show_lines(self):
+        """
+        After all the correction operations, this will plot (matplotlib) everything and 
+        show the original and corrected lines.
+
+        Possibly, in some future, you'll be able to click on the line and see
+        the actual changes, etc.
+        """
+        pass
         
 class Correct:
     """
@@ -61,31 +72,49 @@ class Correct:
 
         if length > or_shp_len: # expand the shp line
 
-            return line
+            aux_line = LineString((vertex_coords[-2], vertex_coords[-1])) # auxiliar line to determine the position
+                                                                          # where the extended line should be
+            aux_line_len = shapely.length(aux_line)
+            aux_line = shapely.affinity.scale(aux_line, xfact=10, yfact=10, origin=shapely.get_point(aux_line, 0))
+            new_final_point = aux_line.interpolate(aux_line_len + (length - or_shp_len))
+            
+            new_vertex_array = np.vstack([vertex_array, np.array((new_final_point, length))])
+            
+            
+            new_line = LineString(new_vertex_array[:,0])
 
+            return new_line
+        
         elif length < or_shp_len: # reduce the shp line -> ok
             
-            new_final_point = line.interpolate(length)
+            new_final_point = line.interpolate(length) # getting the position along the line of the desired length
             new_vertex_array = vertex_array[vertex_array[:,1] < length] # excluding vertices after the disered final point
-            new_vertex_array = np.vstack([new_vertex_array, np.array((new_final_point, length))])
+            new_vertex_array = np.vstack([new_vertex_array, np.array((new_final_point, length))]) # adding the last point
+            new_line = LineString(new_vertex_array[:,0])
 
-            return LineString(new_vertex_array[:,0])
+            return new_line
 
         else: # keep the line length
             return line
 
-        pass
-
     def correct_lines(self, line_shp=gpd.GeoDataFrame, line_lengs=pd.DataFrame):
         
-        testdf = pd.merge(line_shp, line_lengs, how='inner', on="line")
-        testdf["or_shp_len"] = np.round(testdf["geometry"].apply(shapely.length), 2)
+        or_df = pd.merge(line_shp, line_lengs, how='inner', on="line")
+        or_df["or_shp_len"] = np.round(or_df["geometry"].apply(shapely.length), 2)
         
-        testdf = testdf.sort_values(by="line").reset_index(drop=True)
-        #print (testdf["geometry"])
-        print (np.vectorize(self.expand_reduce)(testdf["geometry"], testdf["length (m)"], testdf["or_shp_len"]))
-        #testdf.apply(self.check_lens)
+        or_df = or_df.sort_values(by="line").reset_index(drop=True)
+        new_df = or_df # duplicate the df so the changes after the correction can be seen
+        
+        new_df["geometry"] = np.vectorize(self.expand_reduce)(or_df["geometry"], 
+                                                              or_df["length (m)"], or_df["or_shp_len"])
+        new_df["new_len"] = np.round(shapely.length(new_df["geometry"]), 2)
+        print (new_df[["length (m)", "or_shp_len", "new_len"]])
 
+    def reverse_line (self, line):
+        """
+        If there is need to reverse the sense of some lines
+        """
+        return line.reverse()
 
 if __name__ == "__main__":
     correctobj = Correct()
