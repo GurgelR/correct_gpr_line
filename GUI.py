@@ -9,8 +9,23 @@ It will call the functions created and implemented in "correct.py"
 import correct
 
 class App:
-    def __init__(self) -> None:
+    __slots__ = [
+        # OPERATIONAL
+        "main", "correctobj"
+        # BUTTON
+
+        # RADIOBUTTON
+
+        # TEXT BOX
+
+        # SIMPLE TEXT
+
+    ]
+
+    def __init__(self, main, correctobj) -> None:
         pass
 
 if __name__ == "__main__":
-    App()
+    correctobj = correct.Correct()
+    main = correct.Main(correctobj)
+    App(main, correctobj)
