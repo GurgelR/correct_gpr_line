@@ -2,7 +2,6 @@ import geopandas as gpd
 import pandas as pd
 import numpy as np
 import tkinter.filedialog as fd
-import shapely.affinity
 from shapely.geometry import LineString
 import shapely
 
@@ -12,17 +11,20 @@ class App:
     """
     def __init__(self, correctobj) -> None:
         self.correctobj = correctobj
-        #self.shp_filepath = self.get_filepath(desc="Select the line shapefile", ftypes=[("shp", ".shp")])
-        #self.xl_filepath = self.get_filepath(desc="Select the Excel file of GPR lines", ftypes=[("table", ".xlsx .csv")])
-        self.shp_filepath = "input/example_gpr_lines.shp"
-        self.xl_filepath = "input/example_excel.xlsx"
+        self.shp_filepath = self.get_filepath(desc="Select the line shapefile", ftypes=[("shp", ".shp")])
+        self.xl_filepath = self.get_filepath(desc="Select the Excel file of GPR lines", ftypes=[("table", ".xlsx .csv")])
+        self.exportpath = fd.askdirectory(title="Select the export location")
+        #self.shp_filepath = "input/example_gpr_lines.shp"
+        #self.xl_filepath = "input/example_excel.xlsx"
 
         self.line_shp = gpd.read_file(self.shp_filepath)
         self.line_shp = self.correctobj.correct_format_df(self.line_shp)
-        self.line_lengs = pd.read_excel(self.xl_filepath)
+        self.line_lengs = self.read_table()
         self.line_lengs = self.correctobj.correct_format_df(self.line_lengs)
 
-        self.correctobj.correct_lines(self.line_shp, self.line_lengs)
+        self.new_lines = self.correctobj.correct_lines(self.line_shp, self.line_lengs)
+
+        self.export_new_shp()
 
     def get_filepath(self, desc=str, ftypes=list):
         """
@@ -31,8 +33,22 @@ class App:
         return fd.askopenfilename(title=desc,
                                   filetypes=ftypes)
     
+    def read_table(self):
+        table_format = self.xl_filepath.split(".")[-1].upper()
+        if table_format == "CSV":
+            return pd.read_csv(self.xl_filepath, sep=";")
+        elif table_format == "XLSX":
+            return pd.read_excel(self.xl_filepath)
+    
     def export_new_shp(self):
-        pass
+        """
+        Exporting the corrected lines shape.
+        """
+        filename = self.shp_filepath.split("/")[-1].split(".")[-2] + "_RECTIF.shp"
+        #filepath = "/".join(self.shp_filepath.split("/")[0:-1]) + f"/{filename}"
+        self.new_lines.to_file(self.exportpath + "/" + filename)
+        
+    
 
     def show_lines(self):
         """
@@ -98,6 +114,7 @@ class Correct:
             return line
 
     def correct_lines(self, line_shp=gpd.GeoDataFrame, line_lengs=pd.DataFrame):
+
         
         or_df = pd.merge(line_shp, line_lengs, how='inner', on="line")
         or_df["or_shp_len"] = np.round(or_df["geometry"].apply(shapely.length), 2)
@@ -108,7 +125,8 @@ class Correct:
         new_df["geometry"] = np.vectorize(self.expand_reduce)(or_df["geometry"], 
                                                               or_df["length (m)"], or_df["or_shp_len"])
         new_df["new_len"] = np.round(shapely.length(new_df["geometry"]), 2)
-        print (new_df[["length (m)", "or_shp_len", "new_len"]])
+        #print (new_df[["length (m)", "or_shp_len", "new_len"]])
+        return new_df
 
     def reverse_line (self, line):
         """
