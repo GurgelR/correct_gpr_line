@@ -5,7 +5,7 @@ import tkinter.filedialog as fd
 from shapely.geometry import LineString
 import shapely
 
-class App:
+class Main:
     """
     Designed for, in some future, create a GUI.
     """
@@ -45,10 +45,7 @@ class App:
         Exporting the corrected lines shape.
         """
         filename = self.shp_filepath.split("/")[-1].split(".")[-2] + "_RECTIF.shp"
-        #filepath = "/".join(self.shp_filepath.split("/")[0:-1]) + f"/{filename}"
-        self.new_lines.to_file(self.exportpath + "/" + filename)
-        
-    
+        self.new_lines.to_file(self.exportpath + "/" + filename);
 
     def show_lines(self):
         """
@@ -82,6 +79,15 @@ class Correct:
         return df
 
     def expand_reduce(self, line, length, or_shp_len):
+        """
+        Function to be applied within Correct.correct_lines in order to expand or reduce the GPR line.
+
+        As it is intended to be used as np.vectorize function, it is recommended to be used as such,
+        but can be edited.
+
+        Input formats:
+            pd.Series
+        """
         vertex_coords = [shapely.get_point(line, n) for n in range(shapely.get_num_points(line))] # store the vertices coordinates
         vertex_positions = [np.round(line.line_locate_point(vertex_point), 2) for vertex_point in vertex_coords]
         vertex_array = np.array(list(zip(vertex_coords, vertex_positions)))
@@ -136,4 +142,4 @@ class Correct:
 
 if __name__ == "__main__":
     correctobj = Correct()
-    app = App(correctobj)
+    main = Main(correctobj)
