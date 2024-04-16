@@ -11,20 +11,25 @@ class Main:
     """
     def __init__(self, correctobj) -> None:
         self.correctobj = correctobj
-        self.shp_filepath = self.get_filepath(desc="Select the line shapefile", ftypes=[("shp", ".shp")])
-        self.xl_filepath = self.get_filepath(desc="Select the Excel file of GPR lines", ftypes=[("table", ".xlsx .csv")])
-        self.exportpath = fd.askdirectory(title="Select the export location")
-        #self.shp_filepath = "input/example_gpr_lines.shp"
-        #self.xl_filepath = "input/example_excel.xlsx"
+        self._main_init_()
 
-        self.line_shp = gpd.read_file(self.shp_filepath)
-        self.line_shp = self.correctobj.correct_format_df(self.line_shp)
-        self.line_lengs = self.read_table()
-        self.line_lengs = self.correctobj.correct_format_df(self.line_lengs)
+    def _main_init_(self):
+        if __name__ == "__main__":
+           #self.correctobj = correctobj
+            self.shp_filepath = self.get_filepath(desc="Select the line shapefile", ftypes=[("shp", ".shp")])
+            self.xl_filepath = self.get_filepath(desc="Select the Excel file of GPR lines", ftypes=[("table", ".xlsx .csv")])
+            self.exportpath = fd.askdirectory(title="Select the export location")
+            #self.shp_filepath = "input/example_gpr_lines.shp"
+            #self.xl_filepath = "input/example_excel.xlsx"
 
-        self.new_lines = self.correctobj.correct_lines(self.line_shp, self.line_lengs)
+            self.line_shp = gpd.read_file(self.shp_filepath)
+            self.line_shp = self.correctobj.correct_format_df(self.line_shp)
+            self.line_lengs = self.read_table()
+            self.line_lengs = self.correctobj.correct_format_df(self.line_lengs)
 
-        self.export_new_shp()
+            self.new_lines = self.correctobj.correct_lines(self.line_shp, self.line_lengs)
+
+            self.export_new_shp()
 
     def get_filepath(self, desc=str, ftypes=list):
         """
