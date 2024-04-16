@@ -18,7 +18,7 @@ import correct
 class WindowManage:
     __slots__ = [
         # OPERATIONAL
-        "main", "correctobj", "root", "style",
+        "main", "correctobj", "root", "ttk_style",
         # FRAMES
         "frame1", "frame2", "frame3"
         # BUTTON
@@ -35,6 +35,7 @@ class WindowManage:
         self.main = main
         self.correctobj = correctobj
         self.root = Tk()
+        self.ttk_style = ttk.Style()
         self.set_styles()
         self.generate_interface()
         self.root.mainloop()
@@ -44,25 +45,28 @@ class WindowManage:
         Creating the user interface layout
         """
         self.frame1 = ttk.Frame(self.root, 
-                                width = 200, 
-                                height = 300)
+                                width = 400, 
+                                height = 300,
+                                style="TFrame")
         self.frame2 = ttk.Frame(self.root, 
                                 width = 400, 
-                                height = 300,)
+                                height = 300,
+                                style="TFrame")
         self.frame3 = ttk.Frame(self.root, 
-                                width = 400, 
+                                width = 1500, 
                                 height = 300, 
-                                borderwidth=5)
+                                borderwidth=50,
+                                style="TFrame")
         self.frame1.grid(row=0, column=0, rowspan=15, columnspan=2)
-        self.frame2.grid(row=2, column=0, rowspan=15, columnspan=2)
-        self.frame3.grid(row=0, column=0, rowspan=30, columnspan=2)
-        pass
+        self.frame2.grid(row=15, column=0, rowspan=15, columnspan=2)
+        self.frame3.grid(row=0, column=2, rowspan=30, columnspan=2, sticky="NESW")
+        
 
     def set_styles(self):
         """
         Setting styles
         """
-        ttk.Style().configure("TFrame", relief="flat", background="white")
+        self.ttk_style.configure("TFrame", relief="raised", background="white")
 
 if __name__ == "__main__":
     correctobj = correct.Correct()
