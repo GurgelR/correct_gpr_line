@@ -37,6 +37,7 @@ class WindowManage:
         self.root = Tk()
         self.ttk_style = ttk.Style()
         self.set_styles()
+        self.rows_columns_configure()
         self.generate_interface()
         self.root.mainloop()
         
@@ -45,21 +46,21 @@ class WindowManage:
         Creating the user interface layout
         """
         self.frame1 = ttk.Frame(self.root, 
-                                width = 400, 
-                                height = 300,
+                                width = 100, 
+                                height = 100,
                                 style="TFrame")
         self.frame2 = ttk.Frame(self.root, 
-                                width = 400, 
-                                height = 300,
+                                width = 100, 
+                                height = 100,
                                 style="TFrame")
         self.frame3 = ttk.Frame(self.root, 
-                                width = 1500, 
-                                height = 300, 
+                                width = 100, 
+                                height = 100, 
                                 borderwidth=50,
                                 style="TFrame")
-        self.frame1.grid(row=0, column=0, rowspan=15, columnspan=2)
-        self.frame2.grid(row=15, column=0, rowspan=15, columnspan=2)
-        self.frame3.grid(row=0, column=2, rowspan=30, columnspan=2, sticky="NESW")
+        self.frame1.grid(row=0, column=0, rowspan=15, columnspan=1, sticky="NESW")
+        self.frame2.grid(row=15, column=0, rowspan=15, columnspan=1, sticky="NESW")
+        self.frame3.grid(row=0, column=1, rowspan=30, columnspan=2, sticky="NESW")
         
 
     def set_styles(self):
@@ -67,6 +68,12 @@ class WindowManage:
         Setting styles
         """
         self.ttk_style.configure("TFrame", relief="raised", background="white")
+
+    def rows_columns_configure(self):
+        for row in range(20):
+            self.root.grid_rowconfigure(row, weight=1)
+        for column in range(2):
+            self.root.columnconfigure(column, weight=1)
 
 if __name__ == "__main__":
     correctobj = correct.Correct()
