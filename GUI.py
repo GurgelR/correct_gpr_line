@@ -20,9 +20,9 @@ class WindowManage:
         # OPERATIONAL
         "main", "correctobj", "root", "ttk_style",
         # FRAMES
-        "frame1", "frame2", "frame3"
+        "frame1", "frame2", "frame3",
         # BUTTON
-
+        "import_shp_button", "import_table_button"
         # RADIOBUTTON
 
         # TEXT BOX
@@ -45,22 +45,32 @@ class WindowManage:
         """
         Creating the user interface layout
         """
+        self.root.title("GPR Correct Lines")
+        self.root.wm_state("zoom")
+
         self.frame1 = ttk.Frame(self.root, 
-                                width = 100, 
-                                height = 100,
+                                width = 200, 
+                                height = 200,
                                 style="TFrame")
         self.frame2 = ttk.Frame(self.root, 
-                                width = 100, 
-                                height = 100,
+                                width = 200, 
+                                height = 200,
                                 style="TFrame")
         self.frame3 = ttk.Frame(self.root, 
-                                width = 100, 
+                                width = 500, 
                                 height = 100, 
                                 borderwidth=50,
                                 style="TFrame")
-        self.frame1.grid(row=0, column=0, rowspan=15, columnspan=1, sticky="NESW")
-        self.frame2.grid(row=15, column=0, rowspan=15, columnspan=1, sticky="NESW")
-        self.frame3.grid(row=0, column=1, rowspan=30, columnspan=2, sticky="NESW")
+        self.frame1.grid(row=0, column=0, rowspan=5, sticky="NESW")
+        self.frame2.grid(row=5, column=0, rowspan=5, sticky="NESW")
+        self.frame3.grid(row=0, column=1, rowspan=10, sticky="NESW")
+
+        self.import_shp_button = ttk.Button(self.root,
+                                            width=35,
+                                            text="Import line",
+                                            command=lambda: print ("you are importing a line"))
+        
+        self.import_shp_button.grid(row=0, column=0, sticky="EW")
         
 
     def set_styles(self):
@@ -70,10 +80,12 @@ class WindowManage:
         self.ttk_style.configure("TFrame", relief="raised", background="white")
 
     def rows_columns_configure(self):
+        """
         for row in range(20):
             self.root.grid_rowconfigure(row, weight=1)
         for column in range(2):
-            self.root.columnconfigure(column, weight=1)
+            self.root.grid_columnconfigure(column, weight=1)"""
+        [self.root.grid_rowconfigure(row, weight=1) for row in range (3)]
 
 if __name__ == "__main__":
     correctobj = correct.Correct()
