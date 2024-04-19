@@ -9,10 +9,7 @@ It will call the functions created and implemented in "correct.py"
 from tkinter import ttk
 from tkinter import *
 from tkinter.ttk import *
-
-
 from tkinter import filedialog as fd
-
 import correct
 
 class WindowManage:
@@ -49,35 +46,41 @@ class WindowManage:
         self.root.wm_state("zoom")
 
         self.frame1 = ttk.Frame(self.root, 
-                                width = 200, 
-                                height = 200,
+                                width = 50, 
+                                height = 50,
                                 style="TFrame")
         self.frame2 = ttk.Frame(self.root, 
-                                width = 200, 
-                                height = 200,
+                                width = 50, 
+                                height = 50,
                                 style="TFrame")
         self.frame3 = ttk.Frame(self.root, 
-                                width = 500, 
-                                height = 100, 
-                                borderwidth=50,
+                                height = 100,
                                 style="TFrame")
-        self.frame1.grid(row=0, column=0, rowspan=5, sticky="NESW")
-        self.frame2.grid(row=5, column=0, rowspan=5, sticky="NESW")
-        self.frame3.grid(row=0, column=1, rowspan=10, sticky="NESW")
+        #self.frame1.grid(row=0, column=0, rowspan=15, sticky="NESW")
+        #self.frame2.grid(row=15, column=0, rowspan=2, sticky="NESW")
+        #self.frame3.grid(row=0, column=1, rowspan=2, sticky="NESW")
 
         self.import_shp_button = ttk.Button(self.root,
                                             width=35,
                                             text="Import line",
-                                            command=lambda: print ("you are importing a line"))
+                                            command=lambda: self.main.get_shp_filepath(),
+                                              style="Fun.TButton")
+        self.import_table_button = ttk.Button(self.root,
+                                              width=35,
+                                              text="Import data table",
+                                              command=lambda: self.main.get_xl_filepath(),
+                                              style="Fun.TButton")
         
-        self.import_shp_button.grid(row=0, column=0, sticky="EW")
         
+        self.import_shp_button.grid(row=0, rowspan=2, column=0)
+        self.import_table_button.grid(row=2, rowspan=2, column=0)
 
     def set_styles(self):
         """
         Setting styles
         """
         self.ttk_style.configure("TFrame", relief="raised", background="white")
+        self.ttk_style.configure("Fun.TButton", font="garamond 12")
 
     def rows_columns_configure(self):
         """

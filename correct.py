@@ -5,31 +5,19 @@ import tkinter.filedialog as fd
 from shapely.geometry import LineString
 import shapely
 
+
 class Main:
     """
     Designed for, in some future, create a GUI.
     """
     def __init__(self, correctobj) -> None:
         self.correctobj = correctobj
-        self._main_init_()
 
-    def _main_init_(self):
-        if __name__ == "__main__":
-           #self.correctobj = correctobj
-            self.shp_filepath = self.get_filepath(desc="Select the line shapefile", ftypes=[("shp", ".shp")])
-            self.xl_filepath = self.get_filepath(desc="Select the Excel file of GPR lines", ftypes=[("table", ".xlsx .csv")])
-            self.exportpath = fd.askdirectory(title="Select the export location")
-            #self.shp_filepath = "input/example_gpr_lines.shp"
-            #self.xl_filepath = "input/example_excel.xlsx"
+    def get_shp_filepath(self):
+        self.shp_filepath = self.get_filepath(desc="Select the line shapefile", ftypes=[("shp", ".shp")])
 
-            self.line_shp = gpd.read_file(self.shp_filepath)
-            self.line_shp = self.correctobj.correct_format_df(self.line_shp)
-            self.line_lengs = self.read_table()
-            self.line_lengs = self.correctobj.correct_format_df(self.line_lengs)
-
-            self.new_lines = self.correctobj.correct_lines(self.line_shp, self.line_lengs)
-
-            self.export_new_shp()
+    def get_xl_filepath(self):
+        self.get_xl_filepath = self.get_filepath(desc="Select the Excel file of GPR lines", ftypes=[("table", ".xlsx .csv")])
 
     def get_filepath(self, desc=str, ftypes=list):
         """
@@ -50,7 +38,7 @@ class Main:
         Exporting the corrected lines shape.
         """
         filename = self.shp_filepath.split("/")[-1].split(".")[-2] + "_RECTIF.shp"
-        self.new_lines.to_file(self.exportpath + "/" + filename);
+        self.new_lines.to_file(self.exportpath + "/" + filename)
 
     def show_lines(self):
         """
@@ -61,7 +49,7 @@ class Main:
         the actual changes, etc.
         """
         pass
-        
+
 class Correct:
     """
     Operations for correcting the shape lengths.
@@ -106,7 +94,6 @@ class Correct:
             new_final_point = aux_line.interpolate(aux_line_len + (length - or_shp_len))
             
             new_vertex_array = np.vstack([vertex_array, np.array((new_final_point, length))])
-            
             
             new_line = LineString(new_vertex_array[:,0])
 
