@@ -11,11 +11,12 @@ from tkinter import *
 from tkinter.ttk import *
 from tkinter import filedialog as fd
 import correct
+import pyautogui
 
 class WindowManage:
     __slots__ = [
         # OPERATIONAL
-        "main", "correctobj", "root", "ttk_style",
+        "main", "correctobj", "root", "ttk_style", "screensize",
         # FRAMES
         "frame1", "frame2", "frame3",
         # BUTTON
@@ -28,9 +29,9 @@ class WindowManage:
 
     ]
 
-    def __init__(self, main, correctobj) -> None:
+    def __init__(self, main) -> None:
+        self.screensize = pyautogui.size()
         self.main = main
-        self.correctobj = correctobj
         self.root = Tk()
         self.ttk_style = ttk.Style()
         self.set_styles()
@@ -46,34 +47,38 @@ class WindowManage:
         self.root.wm_state("zoom")
 
         self.frame1 = ttk.Frame(self.root, 
-                                width = 50, 
+                                width = self.screensize.width*.20, 
                                 height = 50,
                                 style="TFrame")
         self.frame2 = ttk.Frame(self.root, 
-                                width = 50, 
+                                width = self.screensize.width*.20, 
                                 height = 50,
                                 style="TFrame")
         self.frame3 = ttk.Frame(self.root, 
+                                width=self.screensize.width*.80,
                                 height = 100,
                                 style="TFrame")
-        #self.frame1.grid(row=0, column=0, rowspan=15, sticky="NESW")
-        #self.frame2.grid(row=15, column=0, rowspan=2, sticky="NESW")
-        #self.frame3.grid(row=0, column=1, rowspan=2, sticky="NESW")
+
 
         self.import_shp_button = ttk.Button(self.root,
-                                            width=35,
+                                            width=self.screensize.width*.20,
                                             text="Import line",
                                             command=lambda: self.main.get_shp_filepath(),
-                                              style="Fun.TButton")
+                                            style="Fun.TButton")
         self.import_table_button = ttk.Button(self.root,
-                                              width=35,
+                                              width=self.screensize.width*.20,
                                               text="Import data table",
                                               command=lambda: self.main.get_xl_filepath(),
                                               style="Fun.TButton")
         
-        
-        self.import_shp_button.grid(row=0, rowspan=2, column=0)
-        self.import_table_button.grid(row=2, rowspan=2, column=0)
+        # gridding frames
+        self.frame1.grid(row=0, column=0, rowspan=2, sticky="NESW")
+        self.frame2.grid(row=2, column=0, rowspan=2, sticky="NESW")
+        self.frame3.grid(row=0, column=1, rowspan=4, sticky="NESW")
+
+        # gridding buttons
+        self.import_shp_button.grid(row=0, column=0)
+        self.import_table_button.grid(row=1, column=0)
 
     def set_styles(self):
         """
@@ -88,9 +93,10 @@ class WindowManage:
             self.root.grid_rowconfigure(row, weight=1)
         for column in range(2):
             self.root.grid_columnconfigure(column, weight=1)"""
-        [self.root.grid_rowconfigure(row, weight=1) for row in range (3)]
+        self.root.grid_rowconfigure([0,1,2,3], weight=1)
+        #self.root.grid_rowconfigure([2,3], weight=1)
+        self.root.grid_columnconfigure(1, weight=1)
 
 if __name__ == "__main__":
-    correctobj = correct.Correct()
-    main = correct.Main(correctobj)
-    WindowManage(main, correctobj)
+    main = correct.Correct()
+    WindowManage(main)

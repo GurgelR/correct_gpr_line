@@ -5,26 +5,27 @@ import tkinter.filedialog as fd
 from shapely.geometry import LineString
 import shapely
 
-
-class Main:
+class Correct:
     """
-    Designed for, in some future, create a GUI.
+    Operations for correcting the shape lengths.
     """
-    def __init__(self, correctobj) -> None:
-        self.correctobj = correctobj
+    __slots__ = [
+        # FILEPATH
+        "shp_filepath", "xl_filepath",
+        # FORMATTED INFO
+        "data_table", "shp_line", "new_lines"
+    ]
+    def __init__(self) -> None:
+        pass
 
     def get_shp_filepath(self):
-        self.shp_filepath = self.get_filepath(desc="Select the line shapefile", ftypes=[("shp", ".shp")])
+        self.shp_filepath = fd.askopenfilename(title="Select the line shapefile", 
+                                               filetypes=[("shp", ".shp")])
 
     def get_xl_filepath(self):
-        self.get_xl_filepath = self.get_filepath(desc="Select the Excel file of GPR lines", ftypes=[("table", ".xlsx .csv")])
-
-    def get_filepath(self, desc=str, ftypes=list):
-        """
-        Simple filedialog
-        """
-        return fd.askopenfilename(title=desc,
-                                  filetypes=ftypes)
+        self.xl_filepath = fd.askopenfilename(title="Select the Excel file of GPR lines", 
+                                              filetypes=[("table", ".xlsx .csv")])
+        self.read_table()
     
     def read_table(self):
         table_format = self.xl_filepath.split(".")[-1].upper()
@@ -33,30 +34,6 @@ class Main:
         elif table_format == "XLSX":
             return pd.read_excel(self.xl_filepath)
     
-    def export_new_shp(self):
-        """
-        Exporting the corrected lines shape.
-        """
-        filename = self.shp_filepath.split("/")[-1].split(".")[-2] + "_RECTIF.shp"
-        self.new_lines.to_file(self.exportpath + "/" + filename)
-
-    def show_lines(self):
-        """
-        After all the correction operations, this will plot (matplotlib) everything and 
-        show the original and corrected lines.
-
-        Possibly, in some future, you'll be able to click on the line and see
-        the actual changes, etc.
-        """
-        pass
-
-class Correct:
-    """
-    Operations for correcting the shape lengths.
-    """
-    def __init__(self) -> None:
-        pass
-
     def get_az(self, line):
         """
         Probably will not be used in this code, but its goal is to calculate the
@@ -132,6 +109,22 @@ class Correct:
         """
         return line.reverse()
 
+    def show_lines(self):
+        """
+        After all the correction operations, this will plot (matplotlib) everything and 
+        show the original and corrected lines.
+
+        Possibly, in some future, you'll be able to click on the line and see
+        the actual changes, etc.
+        """
+        pass
+
+    def export_new_shp(self):
+        """
+        Exporting the corrected lines shape.
+        """
+        filename = self.shp_filepath.split("/")[-1].split(".")[-2] + "_RECTIF.shp"
+        self.new_lines.to_file(self.exportpath + "/" + filename)
+
 if __name__ == "__main__":
     correctobj = Correct()
-    main = Main(correctobj)
